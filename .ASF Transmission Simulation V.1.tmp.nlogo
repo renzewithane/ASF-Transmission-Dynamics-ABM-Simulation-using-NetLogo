@@ -32,11 +32,26 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
+SLIDER
+0
+0
+0
+0
+NIL
+NIL
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
 BUTTON
-143
-56
-228
-89
+141
+55
+226
+88
 setup
 setup
 NIL
@@ -50,10 +65,10 @@ NIL
 1
 
 BUTTON
-234
-56
-319
-89
+232
+55
+317
+88
 go
 go
 NIL
@@ -97,10 +112,10 @@ IT 114 - Quantitative Methods
 1
 
 MONITOR
-325
-50
-390
-95
+324
+49
+389
+94
 % infected
 %infected
 17
@@ -110,13 +125,13 @@ MONITOR
 SLIDER
 7
 10
-391
+389
 43
-swine-count
-swine-count
+farm-count
+farm-count
 1
-1000
-50.0
+500
+251.0
 1
 1
 NIL
@@ -124,13 +139,87 @@ HORIZONTAL
 
 TEXTBOX
 8
-58
+56
 158
-86
-'setup' initializes simulation\n'go' starts simulation
+84
+'setup' initializes simulation
 11
 1.0
 1
+
+TEXTBOX
+38
+69
+188
+87
+'go' starts simulation
+11
+1.0
+1
+
+MONITOR
+7
+183
+71
+228
+weeks
+weeks
+17
+1
+11
+
+MONITOR
+80
+183
+230
+228
+deaths
+deaths
+17
+1
+11
+
+MONITOR
+238
+183
+389
+228
+remaining
+remaining
+17
+1
+11
+
+PLOT
+7
+236
+389
+494
+Swine Population
+weeks
+swine
+0.0
+52.0
+0.0
+1000.0
+true
+true
+"" ""
+PENS
+"latent" 1.0 0 -14439633 true "" "plot count turtles"
+"susceptible" 1.0 0 -1264960 true "" ""
+"infectious" 1.0 0 -2674135 true "" ""
+"diseased" 1.0 0 -15390905 true "" ""
+
+CHOOSER
+203
+117
+389
+162
+simulation-shape
+simulation-shape
+"pigs" "circle"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

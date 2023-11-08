@@ -7,12 +7,12 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 398
-10
-881
-494
+11
+877
+491
 -1
 -1
-14.4
+14.3
 1
 10
 1
@@ -67,30 +67,30 @@ NIL
 0
 
 TEXTBOX
-448
-499
-863
-527
+23
+443
+438
+471
 ASF Transmission Dynamics Simulation using NetLogo
-16
+15
 1.0
 1
 
 TEXTBOX
-536
-522
-782
-550
+96
+463
+342
+491
 Mortiga - Toral - Postre - Macarilay - Alimba
 11
 1.0
 1
 
 TEXTBOX
-570
-537
-719
-555
+130
+478
+279
+496
 IT 114 - Quantitative Methods
 11
 1.0
@@ -144,9 +144,9 @@ TEXTBOX
 
 MONITOR
 7
-183
+154
 71
-228
+199
 weeks
 weeks
 17
@@ -155,9 +155,9 @@ weeks
 
 MONITOR
 80
-183
+154
 230
-228
+199
 deaths
 deaths
 17
@@ -166,9 +166,9 @@ deaths
 
 MONITOR
 238
-183
+154
 389
-228
+199
 remaining
 remaining
 17
@@ -177,9 +177,9 @@ remaining
 
 PLOT
 7
-236
+206
 389
-494
+438
 Swine Population
 weeks
 swine
@@ -198,9 +198,9 @@ PENS
 
 CHOOSER
 203
-117
+102
 389
-162
+147
 simulation-shape
 simulation-shape
 "pigs" "circle"
@@ -208,9 +208,9 @@ simulation-shape
 
 SLIDER
 8
-123
+102
 195
-156
+135
 routes
 routes
 1

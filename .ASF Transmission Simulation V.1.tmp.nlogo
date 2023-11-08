@@ -32,21 +32,6 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-SLIDER
-0
-0
-0
-0
-NIL
-NIL
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
 141
 55
@@ -220,6 +205,21 @@ simulation-shape
 simulation-shape
 "pigs" "circle"
 0
+
+SLIDER
+8
+123
+195
+156
+routes
+routes
+1
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

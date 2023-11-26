@@ -1,15 +1,17 @@
-globals [num-agents weeks deaths remaining %infected PIG-COUNT]
+globals [num-agents weeks deaths remaining %infected PIG-COUNT initial-positions spread-interval]
 
 to setup
   clear-all
-  set num-agents 1000
+  calculate-number-of-agents
   set weeks 0
   set deaths 0
   set remaining num-agents
   set %infected 0 ; Initialize %infected
   set PIG-COUNT 0 ; Initialize PIG-COUNT
+  set spread-interval 5 ; Set the interval for spreading susceptible agents (in ticks)
   create-agents
   update-pig-count ; Add this line to update the pig count monitor
+  set initial-positions [list xcor ycor] of turtles ; Store initial positions
   reset-ticks
 end
 
@@ -31,18 +33,35 @@ to set-shape
   ]
 end
 
+to calculate-number-of-agents
+  let sf-percentage 0.6
+  let mf-percentage 0.3
+  let lf-percentage 0.1
+
+  let sf-agents int (farm-count * sf-percentage * (1 + random 9))
+  let mf-agents int (farm-count * mf-percentage * (11 + random 14))
+  let lf-agents int (farm-count * lf-percentage * (26 + random 24))
+
+  let total-agents sf-agents + mf-agents + lf-agents
+  set num-agents total-agents ; Directly set the global variable
+end
+
 to go
+  if ticks >= 52 [
+    stop
+  ]
   move-agents
   update-model
+  spread-susceptible ; Add this line to spread the susceptible agents
+
+  ; Slow down the simulation by adding a delay
+  wait 0.1 ; Adjust the delay time as needed
+
   tick
 end
 
 to move-agents
-  ask turtles [
-    rt random 30 - 15
-    fd 1
-    set color one-of [red pink blue green]
-  ]
+  ; Do nothing to keep the agents' positions constant
 end
 
 to update-model
@@ -66,7 +85,18 @@ to update-model
 end
 
 to update-pig-count
-  set PIG-COUNT count turtles with [shape = "pigg"]
+  set PIG-COUNT count turtles
+end
+
+to spread-susceptible
+  ; Identify the susceptible agents (pink)
+  let susceptible-turtles turtles with [color = pink]
+
+  ask susceptible-turtles [
+    if (random-float 1 < 0.1) [
+      set color red
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -120,7 +150,7 @@ BUTTON
 88
 go
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -128,7 +158,7 @@ NIL
 NIL
 NIL
 NIL
-1
+0
 
 TEXTBOX
 23
@@ -179,8 +209,8 @@ SLIDER
 farm-count
 farm-count
 1
-500
-232.0
+250
+179.0
 1
 1
 NIL

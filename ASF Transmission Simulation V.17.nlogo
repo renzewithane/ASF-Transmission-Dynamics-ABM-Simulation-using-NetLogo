@@ -1,4 +1,4 @@
-globals [num-agents weeks deaths remaining ]
+globals [num-agents weeks deaths remaining %infected PIG-COUNT]
 
 to setup
   clear-all
@@ -6,16 +6,28 @@ to setup
   set weeks 0
   set deaths 0
   set remaining num-agents
+  set %infected 0 ; Initialize %infected
+  set PIG-COUNT 0 ; Initialize PIG-COUNT
   create-agents
+  update-pig-count ; Add this line to update the pig count monitor
   reset-ticks
 end
 
 to create-agents
   create-turtles num-agents [
     set color pink
+    set-shape
+    setxy random-xcor random-ycor ; Set initial position without changing it later
+  ]
+end
+
+to set-shape
+  ifelse (simulation-shape = "pigs") [
     set shape "pigg"
     set size 1
-    setxy random-xcor random-ycor
+  ] [
+    set shape "circle"
+    set size 0.5 ; Adjust the size as needed for circles
   ]
 end
 
@@ -42,11 +54,19 @@ to update-model
   set deaths deaths + deaths-this-week
   set remaining num-agents - deaths
 
-  ; Calculate percentage of infected pigs
-  let %infected (count turtles with [color = blue]) / num-agents * 100
+  ; Calculate percentage of infected pigs and update global variable
+  let raw-infected count turtles with [color = blue] / num-agents * 100
+  set %infected round (raw-infected * 10000) / 10000 ; Round to 4 decimal places
 
   ; Display information
   print (word "Week: " weeks ", Deaths: " deaths ", Remaining: " remaining ", %infected: " %infected "%")
+
+  ; Update pig count monitor
+  update-pig-count
+end
+
+to update-pig-count
+  set PIG-COUNT count turtles with [shape = "pigg"]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -77,9 +97,9 @@ ticks
 30.0
 
 BUTTON
-141
+118
 55
-226
+213
 88
 setup
 setup
@@ -94,7 +114,7 @@ NIL
 1
 
 BUTTON
-232
+222
 55
 317
 88
@@ -108,7 +128,7 @@ NIL
 NIL
 NIL
 NIL
-0
+1
 
 TEXTBOX
 23
@@ -166,30 +186,10 @@ farm-count
 NIL
 HORIZONTAL
 
-TEXTBOX
-8
-56
-158
-84
-'setup' initializes simulation
-11
-1.0
-1
-
-TEXTBOX
-38
-69
-188
-87
-'go' starts simulation
-11
-1.0
-1
-
 MONITOR
-7
+97
 154
-71
+190
 199
 weeks
 weeks
@@ -198,9 +198,9 @@ weeks
 11
 
 MONITOR
-80
+197
 154
-230
+289
 199
 deaths
 deaths
@@ -209,7 +209,7 @@ deaths
 11
 
 MONITOR
-238
+296
 154
 389
 199
@@ -220,7 +220,7 @@ remaining
 11
 
 PLOT
-7
+8
 206
 389
 438
@@ -264,6 +264,34 @@ routes
 1
 NIL
 HORIZONTAL
+
+BUTTON
+8
+55
+107
+88
+clear
+clear-all
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+8
+154
+91
+199
+pig-count
+pig-count
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

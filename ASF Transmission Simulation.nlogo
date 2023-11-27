@@ -2,6 +2,7 @@ globals [num-agents weeks deaths remaining %infected PIG-COUNT initial-positions
 
 to setup
   clear-all
+  reset-ticks ; Add this line to reset the ticks counter
   calculate-number-of-agents
   set weeks 0
   set deaths 0
@@ -12,7 +13,39 @@ to setup
   create-agents
   update-pig-count ; Add this line to update the pig count monitor
   set initial-positions [list xcor ycor] of turtles ; Store initial positions
-  reset-ticks
+
+  ; Create a plot for "Swine Population"
+  set-current-plot "Swine Population"
+  plot 0 ; Initialize the plot with 0
+
+  ; Configure the "susceptible" pen
+  set-current-plot-pen "susceptible"
+  set-plot-pen-mode 1 ; Set the mode to "number of turtles"
+
+  ; Configure the "latent" pen
+  set-current-plot-pen "latent"
+  set-plot-pen-mode 0 ; Set the mode to "number of turtles"
+
+  if not any? patches with [pcolor = red] [
+    move-agents
+    update-model
+    spread-susceptible ; Add this line to spread the susceptible agents
+
+    ; Update the "susceptible" pen with the count of susceptible agents
+    set-current-plot "Swine Population"
+    set-current-plot-pen "susceptible"
+    set-plot-pen-mode 0 ; Set mode to "no lines"
+    plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
+
+    ; Update the "latent" pen with the count of latent agents
+    set-current-plot-pen "latent"
+    set-plot-pen-mode 0 ; Set mode to "no lines"
+    plot count turtles with [color = pink] ; Count the number of latent agents
+
+    ; Slow down the simulation by adding a delay
+    wait 0.1 ; Adjust the delay time as needed
+    tick
+  ]
 end
 
 to create-agents
@@ -47,17 +80,32 @@ to calculate-number-of-agents
 end
 
 to go
+  if not any? turtles [
+    stop
+  ]
   if ticks >= 52 [
     stop
   ]
-  move-agents
-  update-model
-  spread-susceptible ; Add this line to spread the susceptible agents
+  if not any? patches with [pcolor = red] [
+    move-agents
+    update-model
+    spread-susceptible ; Add this line to spread the susceptible agents
 
-  ; Slow down the simulation by adding a delay
-  wait 0.1 ; Adjust the delay time as needed
+    ; Update the "susceptible" pen with the count of susceptible agents
+    set-current-plot "Swine Population"
+    set-current-plot-pen "susceptible"
+    set-plot-pen-mode 0 ; Set mode to "no lines"
+    plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
 
-  tick
+    ; Update the "latent" pen with the count of latent agents
+    set-current-plot-pen "latent"
+    set-plot-pen-mode 0 ; Set mode to "no lines"
+    plot count turtles with [color = pink] ; Count the number of latent agents
+
+    ; Slow down the simulation by adding a delay
+    wait 0.1 ; Adjust the delay time as needed
+    tick
+  ]
 end
 
 to move-agents
@@ -89,15 +137,20 @@ to update-pig-count
 end
 
 to spread-susceptible
-  ; Identify the susceptible agents (pink)
+  ; Identify the susceptible agents (pink) and make them orange + 1
   let susceptible-turtles turtles with [color = pink]
-
   ask susceptible-turtles [
-    if (random-float 1 < 0.1) [
-      set color red
+    set color pink ; Change color to pink initially
+  ]
+
+  ; Only introduce susceptible agents when 'go' button is clicked
+  if ticks > 0 [
+    ask n-of (count turtles * 0.1) turtles [
+      set color orange + 1 ; Change color to orange plus 1
     ]
   ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 398
@@ -210,7 +263,7 @@ farm-count
 farm-count
 1
 250
-179.0
+1.0
 1
 1
 NIL
@@ -260,15 +313,15 @@ swine
 0.0
 52.0
 0.0
-1000.0
+0.0
 true
 true
 "" ""
 PENS
-"latent" 1.0 0 -14439633 true "" "plot count turtles"
-"susceptible" 1.0 0 -1264960 true "" ""
+"latent" 1.0 0 -2064490 true "" ""
+"susceptible" 1.0 0 -817084 true "" ""
 "infectious" 1.0 0 -2674135 true "" ""
-"diseased" 1.0 0 -15390905 true "" ""
+"diseased" 1.0 0 -12186836 true "" ""
 
 CHOOSER
 203
@@ -278,7 +331,7 @@ CHOOSER
 simulation-shape
 simulation-shape
 "pigs" "circle"
-1
+0
 
 SLIDER
 8

@@ -26,26 +26,24 @@ to setup
   set-current-plot-pen "latent"
   set-plot-pen-mode 0 ; Set the mode to "number of turtles"
 
-  if not any? patches with [pcolor = red] [
-    move-agents
-    update-model
-    spread-susceptible ; Add this line to spread the susceptible agents
+  move-agents
+  update-model
+  spread-susceptible ; Add this line to spread the susceptible agents
 
-    ; Update the "susceptible" pen with the count of susceptible agents
-    set-current-plot "Swine Population"
-    set-current-plot-pen "susceptible"
-    set-plot-pen-mode 0 ; Set mode to "no lines"
-    plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
+  ; Update the "susceptible" pen with the count of susceptible agents
+  set-current-plot "Swine Population"
+  set-current-plot-pen "susceptible"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
 
-    ; Update the "latent" pen with the count of latent agents
-    set-current-plot-pen "latent"
-    set-plot-pen-mode 0 ; Set mode to "no lines"
-    plot count turtles with [color = pink] ; Count the number of latent agents
+  ; Update the "latent" pen with the count of latent agents
+  set-current-plot-pen "latent"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = pink] ; Count the number of latent agents
 
-    ; Slow down the simulation by adding a delay
-    wait 0.1 ; Adjust the delay time as needed
-    tick
-  ]
+  ; Slow down the simulation by adding a delay
+  wait 0.1 ; Adjust the delay time as needed
+  tick
 end
 
 to create-agents
@@ -86,26 +84,24 @@ to go
   if ticks >= 52 [
     stop
   ]
-  if not any? patches with [pcolor = red] [
-    move-agents
-    update-model
-    spread-susceptible ; Add this line to spread the susceptible agents
+  move-agents
+  update-model
+  spread-susceptible ; Add this line to spread the susceptible agents
 
-    ; Update the "susceptible" pen with the count of susceptible agents
-    set-current-plot "Swine Population"
-    set-current-plot-pen "susceptible"
-    set-plot-pen-mode 0 ; Set mode to "no lines"
-    plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
+  ; Update the "susceptible" pen with the count of susceptible agents
+  set-current-plot "Swine Population"
+  set-current-plot-pen "susceptible"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = orange + 1] ; Count the number of susceptible agents
 
-    ; Update the "latent" pen with the count of latent agents
-    set-current-plot-pen "latent"
-    set-plot-pen-mode 0 ; Set mode to "no lines"
-    plot count turtles with [color = pink] ; Count the number of latent agents
+  ; Update the "latent" pen with the count of latent agents
+  set-current-plot-pen "latent"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = pink] ; Count the number of latent agents
 
-    ; Slow down the simulation by adding a delay
-    wait 0.1 ; Adjust the delay time as needed
-    tick
-  ]
+  ; Slow down the simulation by adding a delay
+  wait 0.1 ; Adjust the delay time as needed
+  tick
 end
 
 to move-agents
@@ -137,6 +133,7 @@ to update-pig-count
 end
 
 to spread-susceptible
+  let factor 0.5 ; Adjust the factor as needed
   ; Identify the susceptible agents (pink) and make them orange + 1
   let susceptible-turtles turtles with [color = pink]
   ask susceptible-turtles [
@@ -145,11 +142,36 @@ to spread-susceptible
 
   ; Only introduce susceptible agents when 'go' button is clicked
   if ticks > 0 [
-    ask n-of (count turtles * 0.1) turtles [
+    ; Select a random source turtle
+    let source-turtle one-of turtles
+    ask source-turtle [
       set color orange + 1 ; Change color to orange plus 1
+    ]
+
+    ; Spread gradually from the source to nearby turtles
+    ask turtles with [color = pink] [
+      let distance-to-source distance source-turtle
+      if distance-to-source <= 5 [
+        let max-distance max [distance source-turtle] of turtles with [color = orange + 1]
+        if max-distance > 0 [
+          let normalized-distance distance-to-source / max-distance
+          ; Adjust the chance of spreading based on the number of turtles
+          let chance factor * normalized-distance
+          ifelse random-float 1 < chance [
+            set color orange + 1 ; Change color to orange plus 1
+          ] [
+            ; Do nothing or add any other actions for the "else" case
+          ]
+        ]
+      ]
     ]
   ]
 end
+
+
+
+
+
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -263,7 +285,7 @@ farm-count
 farm-count
 1
 250
-1.0
+59.0
 1
 1
 NIL
@@ -342,7 +364,7 @@ routes
 routes
 1
 100
-45.0
+46.0
 1
 1
 NIL

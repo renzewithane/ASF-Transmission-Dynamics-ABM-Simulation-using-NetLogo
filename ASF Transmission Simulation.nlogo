@@ -1,15 +1,16 @@
-globals [num-agents weeks deaths remaining %infected PIG-COUNT initial-positions spread-interval]
+globals [num-agents day deaths remaining %infected PIG-COUNT initial-positions spread-interval orange-source]
 
 to setup
   clear-all
   reset-ticks ; Add this line to reset the ticks counter
   calculate-number-of-agents
-  set weeks 0
+  set day 0
   set deaths 0
   set remaining num-agents
   set %infected 0 ; Initialize %infected
   set PIG-COUNT 0 ; Initialize PIG-COUNT
   set spread-interval 5 ; Set the interval for spreading susceptible agents (in ticks)
+  set orange-source nobody ; Initialize the orange + 1 source turtle
   create-agents
   update-pig-count ; Add this line to update the pig count monitor
   set initial-positions [list xcor ycor] of turtles ; Store initial positions
@@ -28,7 +29,12 @@ to setup
 
   move-agents
   update-model
-  spread-susceptible ; Add this line to spread the susceptible agents
+
+  ; At setup, set one pink agent to orange + 1
+  ask one-of turtles with [color = pink] [
+    set color red
+    set orange-source self ; Set the orange + 1 source turtle
+  ]
 
   ; Update the "susceptible" pen with the count of susceptible agents
   set-current-plot "Swine Population"
@@ -81,12 +87,14 @@ to go
   if not any? turtles [
     stop
   ]
-  if ticks >= 52 [
+  if ticks >= 365 [
     stop
   ]
   move-agents
   update-model
-  spread-susceptible ; Add this line to spread the susceptible agents
+  if ticks >= 10 and ticks mod spread-interval = 0 [
+    spread-susceptible ; Add this line to spread the susceptible agents at regular intervals
+  ]
 
   ; Update the "susceptible" pen with the count of susceptible agents
   set-current-plot "Swine Population"
@@ -109,7 +117,7 @@ to move-agents
 end
 
 to update-model
-  set weeks weeks + 1
+  set day day + 1
   let death-rate 3 ; Adjust this based on your scenario
   let deaths-this-week count turtles with [color = blue and random-float 1 < death-rate]
 
@@ -122,7 +130,7 @@ to update-model
   set %infected round (raw-infected * 10000) / 10000 ; Round to 4 decimal places
 
   ; Display information
-  print (word "Week: " weeks ", Deaths: " deaths ", Remaining: " remaining ", %infected: " %infected "%")
+  print (word "Day: " day ", Deaths: " deaths ", Remaining: " remaining ", %infected: " %infected "%")
 
   ; Update pig count monitor
   update-pig-count
@@ -141,38 +149,30 @@ to spread-susceptible
   ]
 
   ; Only introduce susceptible agents when 'go' button is clicked
-  if ticks > 0 [
-    ; Select a random source turtle
-    let source-turtle one-of turtles
-    ask source-turtle [
-      set color orange + 1 ; Change color to orange plus 1
-    ]
+  ; Select a random source turtle
+  let source-turtle one-of turtles
+  ask source-turtle [
+    set color orange + 1 ; Change color to orange plus 1
+  ]
 
-    ; Spread gradually from the source to nearby turtles
-    ask turtles with [color = pink] [
-      let distance-to-source distance source-turtle
-      if distance-to-source <= 5 [
-        let max-distance max [distance source-turtle] of turtles with [color = orange + 1]
-        if max-distance > 0 [
-          let normalized-distance distance-to-source / max-distance
-          ; Adjust the chance of spreading based on the number of turtles
-          let chance factor * normalized-distance
-          ifelse random-float 1 < chance [
-            set color orange + 1 ; Change color to orange plus 1
-          ] [
-            ; Do nothing or add any other actions for the "else" case
-          ]
+  ; Spread gradually from the source to nearby turtles
+  ask turtles with [color = pink] [
+    let distance-to-source distance source-turtle
+    if distance-to-source <= 5 [
+      let max-distance max [distance source-turtle] of turtles with [color = red]
+      if max-distance > 0 [
+        let normalized-distance distance-to-source / max-distance
+        ; Adjust the chance of spreading based on the number of turtles
+        let chance factor * normalized-distance
+        ifelse random-float 1 < chance [
+          set color orange + 1 ; Change color to orange plus 1
+        ] [
+          ; Do nothing or add any other actions for the "else" case
         ]
       ]
     ]
   ]
 end
-
-
-
-
-
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 398
@@ -285,7 +285,7 @@ farm-count
 farm-count
 1
 250
-59.0
+99.0
 1
 1
 NIL
@@ -296,8 +296,8 @@ MONITOR
 154
 190
 199
-weeks
-weeks
+day
+day
 17
 1
 11
@@ -330,10 +330,10 @@ PLOT
 389
 438
 Swine Population
-weeks
+days
 swine
 0.0
-52.0
+365.0
 0.0
 0.0
 true
@@ -343,7 +343,7 @@ PENS
 "latent" 1.0 0 -2064490 true "" ""
 "susceptible" 1.0 0 -817084 true "" ""
 "infectious" 1.0 0 -2674135 true "" ""
-"diseased" 1.0 0 -12186836 true "" ""
+"deceased" 1.0 0 -12186836 true "" ""
 
 CHOOSER
 203
@@ -364,7 +364,7 @@ routes
 routes
 1
 100
-46.0
+100.0
 1
 1
 NIL
@@ -390,9 +390,9 @@ NIL
 MONITOR
 8
 154
-91
+90
 199
-pig-count
+initial pig count
 pig-count
 17
 1

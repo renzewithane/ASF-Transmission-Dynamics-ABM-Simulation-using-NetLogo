@@ -285,7 +285,7 @@ farm-count
 farm-count
 1
 250
-99.0
+250.0
 1
 1
 NIL
@@ -353,7 +353,7 @@ CHOOSER
 simulation-shape
 simulation-shape
 "pigs" "circle"
-0
+1
 
 SLIDER
 8
@@ -364,7 +364,7 @@ routes
 routes
 1
 100
-100.0
+1.0
 1
 1
 NIL

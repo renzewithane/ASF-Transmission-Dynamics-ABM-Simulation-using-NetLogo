@@ -66,7 +66,7 @@ to set-shape
     set size 1.25
   ] [
     set shape "circle"
-    set size 1.5 ; Adjust the size as needed for circles
+    set size 1 ; Adjust the size as needed for circles
   ]
 end
 
@@ -154,7 +154,21 @@ to update-pig-count
 end
 
 to spread-susceptible
-  let factor 0.5 ; Adjust the factor as needed
+  ; Define the factor based on the number of agents
+  let factor 0.1
+  if count turtles >= 0 and count turtles < 500 [
+    set factor random-float (0.1 + 0.4) ; Random number between 0.1 and 0.5
+  ]
+  if count turtles >= 500 and count turtles < 1000 [
+    set factor random-float (0.6 + 0.4) ; Random number between 0.6 and 1
+  ]
+  if count turtles >= 1000 and count turtles < 2000 [
+    set factor random-float (1.1 + 0.9) ; Random number between 1.1 and 2
+  ]
+  if count turtles >= 2000 [
+    set factor random-float (2.1 + 0.9) ; Random number between 2.1 and 3
+  ]
+
   ; Identify the susceptible agents (pink) and make them orange + 1
   let susceptible-turtles turtles with [color = pink]
   ask susceptible-turtles [
@@ -175,7 +189,7 @@ to spread-susceptible
       let max-distance max [distance source-turtle] of turtles with [color = red]
       if max-distance > 0 [
         let normalized-distance distance-to-source / max-distance
-        ; Adjust the chance of spreading based on the number of turtles
+        ; Adjust the chance of spreading based on the number of turtles and the factor
         let chance factor * normalized-distance
         ifelse random-float 1 < chance [
           set color orange + 1 ; Change color to orange plus 1
@@ -186,6 +200,7 @@ to spread-susceptible
     ]
   ]
 end
+
 
 to spread-infectious
   ; Identify the infectious agents (orange + 1) and make them pink after a delay
@@ -206,7 +221,6 @@ to spread-deceased
     ]
   ]
 end
-
 
 
 
@@ -325,7 +339,7 @@ farm-count
 farm-count
 30
 200
-76.0
+200.0
 1
 1
 NIL
@@ -404,7 +418,7 @@ routes
 routes
 1
 100
-1.0
+22.0
 1
 1
 NIL

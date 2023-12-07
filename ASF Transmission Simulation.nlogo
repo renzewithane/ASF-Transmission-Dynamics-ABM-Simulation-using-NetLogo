@@ -63,10 +63,10 @@ end
 to set-shape
   ifelse (simulation-shape = "pigs") [
     set shape "pigg"
-    set size 1
+    set size 1.25
   ] [
     set shape "circle"
-    set size 0.5 ; Adjust the size as needed for circles
+    set size 1.5 ; Adjust the size as needed for circles
   ]
 end
 
@@ -93,7 +93,9 @@ to go
   move-agents
   update-model
   if ticks >= 10 and ticks mod spread-interval = 0 [
-    spread-susceptible ; Add this line to spread the susceptible agents at regular intervals
+    spread-susceptible
+    spread-infectious ; Add this line to spread infectious agents
+    spread-deceased ; Add this line to spread deceased agents
   ]
 
   ; Update the "susceptible" pen with the count of susceptible agents
@@ -107,10 +109,21 @@ to go
   set-plot-pen-mode 0 ; Set mode to "no lines"
   plot count turtles with [color = pink] ; Count the number of latent agents
 
+  ; Update the "infectious" pen with the count of infectious agents
+  set-current-plot-pen "infectious"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = red] ; Count the number of infectious agents
+
+  ; Update the "deceased" pen with the count of deceased agents
+  set-current-plot-pen "deceased"
+  set-plot-pen-mode 0 ; Set mode to "no lines"
+  plot count turtles with [color = magenta - 3] ; Count the number of deceased agents
+
   ; Slow down the simulation by adding a delay
   wait 0.1 ; Adjust the delay time as needed
   tick
 end
+
 
 to move-agents
   ; Do nothing to keep the agents' positions constant
@@ -173,6 +186,33 @@ to spread-susceptible
     ]
   ]
 end
+
+to spread-infectious
+  ; Identify the infectious agents (orange + 1) and make them pink after a delay
+  ask turtles with [color = orange + 1] [
+    let delay-time random 11 + 5 ; Random delay between 5 and 15 ticks
+    if ticks mod (delay-time + 1) = 0 [
+      set color red ; Change color to red
+    ]
+  ]
+end
+
+to spread-deceased
+  ; Identify the deceased agents (red) and make them magenta-3 after a delay
+  ask turtles with [color = red] [
+    let delay-time random 11 + 5 ; Random delay between 5 and 15 ticks
+    if ticks mod (delay-time + 1) = 0 [
+      set color magenta - 3 ; Change color to magenta-3
+    ]
+  ]
+end
+
+
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 398
@@ -283,9 +323,9 @@ SLIDER
 43
 farm-count
 farm-count
-1
-250
-250.0
+30
+200
+76.0
 1
 1
 NIL
@@ -401,39 +441,25 @@ pig-count
 @#$#@#$#@
 ## WHAT IS IT?
 
-This project models an agent-based simulation that visualises emerging dynamics from the interaction and influence of a small subset of multiple biological and social factors in the development of the African Swine Fever (ASF) Virus. Given the scale of the virus, and the complexity of global societal structures, the simulation may not be viewed as a precise model of universal application. The simulation may however be tailored to locales to enable governments, specifically the District II of Camarines Norte, Philippines where this project originated, to assess intervention strategies and outcomes at local, municipal and district levels. In facilitating such analysis, variables that play a critical role in the development of the pandemic have been singled out for manipulation in the model.
-
-## HOW IT WORKS
-
-(what rules the agents use to create the overall behavior of the model)
-
-## HOW TO USE IT
-
-(how to use the model, including a description of each of the items in the Interface tab)
-
-## THINGS TO NOTICE
-
-(suggested things for the user to notice while running the model)
-
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+This project models an agent-based simulation that visualises emerging dynamics from the interaction and influence of a small subset of multiple biological and social factors in the development of the African Swine Fever (ASF) Virus. Given the scale of the virus, and the complexity of global societal structures, the simulation may not be viewed as a precise model of universal application. The simulation may, however, be tailored to locales to enable governments, specifically the District II of Camarines Norte, Philippines where this project originated, to assess intervention strategies and outcomes at local, municipal and district levels. In facilitating such analysis, variables that play a critical role in the development of the pandemic have been singled out for manipulation in the model.
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+This African Swine Fever Transmission Simulation was created in partial fulfillment of for IT 114 - Quantitative Methods (Modelling and Simulation) by the following:
+
+<ul>
+  <li><a href="https://www.facebook.com/cherylmarie.alimba" style="text-decoration: none; color: inherit;">Alimba, Cheryl Marie C.</a></li>
+  <li><a href="https://www.facebook.com/jenelyn.macarilay.jenayy27" style="text-decoration: none; color: inherit;">Macarilay, Jenelyn E.</a></li>
+  <li><a href="https://www.facebook.com/renzewithane" style="text-decoration: none; color: inherit;">Mortiga, Renze Meinard</a></li>
+  <li><a href="https://www.facebook.com/wendee.postre.37" style="text-decoration: none; color: inherit;">Postre, Wendee D.</a></li>
+  <li><a href="https://www.facebook.com/tin.trl" style="text-decoration: none; color: inherit;">Toral, Christine M.</a></li>
+</ul>
+
+Presented and Submitted to:
+
+<ul>
+  <li><a href="https://www.facebook.com/edgarbryann" style="text-decoration: none; color: inherit;">Nicart, Edgar Bryan B., MIT</a></li>
+</ul>
 @#$#@#$#@
 default
 true

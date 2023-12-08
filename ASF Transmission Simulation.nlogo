@@ -22,10 +22,22 @@ to setup
   ; Configure the "susceptible" pen
   set-current-plot-pen "susceptible"
   set-plot-pen-mode 1 ; Set the mode to "number of turtles"
+  set-plot-pen-color orange ; Set color to orange
 
   ; Configure the "latent" pen
   set-current-plot-pen "latent"
-  set-plot-pen-mode 0 ; Set the mode to "number of turtles"
+  set-plot-pen-mode 1 ; Set the mode to "number of turtles"
+  set-plot-pen-color pink ; Set color to pink
+
+  ; Configure the "infectious" pen
+  set-current-plot-pen "infectious"
+  set-plot-pen-mode 1 ; Set the mode to "number of turtles"
+  set-plot-pen-color red ; Set color to red
+
+  ; Configure the "deceased" pen
+  set-current-plot-pen "deceased"
+  set-plot-pen-mode 1 ; Set mode to "number of turtles"
+  set-plot-pen-color magenta - 3 ; Set color to magenta-3
 
   move-agents
   update-model
@@ -59,6 +71,7 @@ to create-agents
     setxy random-xcor random-ycor ; Set initial position without changing it later
   ]
 end
+
 
 to set-shape
   ifelse (simulation-shape = "pigs") [
@@ -131,19 +144,15 @@ end
 
 to update-model
   set day day + 1
-  let death-rate 3 ; Adjust this based on your scenario
-  let deaths-this-week count turtles with [color = blue and random-float 1 < death-rate]
+  let deaths-this-week count turtles with [color = magenta - 3]
 
   ; Update deaths and remaining
-  set deaths deaths + deaths-this-week
+  set deaths deaths-this-week
   set remaining num-agents - deaths
 
   ; Calculate percentage of infected pigs and update global variable
-  let raw-infected count turtles with [color = blue] / num-agents * 100
-  set %infected round (raw-infected * 10000) / 10000 ; Round to 4 decimal places
-
-  ; Display information
-  print (word "Day: " day ", Deaths: " deaths ", Remaining: " remaining ", %infected: " %infected "%")
+let raw-infected count turtles with [member? color (list (magenta - 3) red)] / num-agents * 100
+set %infected round (raw-infected * 10000) / 10000 ; Round to 4 decimal places
 
   ; Update pig count monitor
   update-pig-count
@@ -154,19 +163,39 @@ to update-pig-count
 end
 
 to spread-susceptible
-  ; Define the factor based on the number of agents
-  let factor 0.1
-  if count turtles >= 0 and count turtles < 500 [
-    set factor random-float (0.1 + 0.4) ; Random number between 0.1 and 0.5
+  ; Use the routes slider to determine how random the orange + 1 will spread
+  let random-chance 0
+
+  ; Define the chance of spreading based on the range of the routes slider
+  if routes >= 1 and routes <= 10 [
+    set random-chance random 10
   ]
-  if count turtles >= 500 and count turtles < 1000 [
-    set factor random-float (0.6 + 0.4) ; Random number between 0.6 and 1
+  if routes >= 11 and routes <= 20 [
+    set random-chance random 10 + 10
   ]
-  if count turtles >= 1000 and count turtles < 2000 [
-    set factor random-float (1.1 + 0.9) ; Random number between 1.1 and 2
+  if routes >= 21 and routes <= 30 [
+    set random-chance random 20 + 10
   ]
-  if count turtles >= 2000 [
-    set factor random-float (2.1 + 0.9) ; Random number between 2.1 and 3
+  if routes >= 31 and routes <= 40 [
+    set random-chance random 30 + 10
+  ]
+  if routes >= 41 and routes <= 50 [
+    set random-chance random 40 + 10
+  ]
+  if routes >= 51 and routes <= 60 [
+    set random-chance random 50 + 10
+  ]
+  if routes >= 61 and routes <= 70 [
+    set random-chance random 60 + 10
+  ]
+  if routes >= 71 and routes <= 80 [
+    set random-chance random 70 + 10
+  ]
+  if routes >= 81 and routes <= 90 [
+    set random-chance random 80 + 10
+  ]
+  if routes >= 91 and routes <= 100 [
+    set random-chance random 90 + 10
   ]
 
   ; Identify the susceptible agents (pink) and make them orange + 1
@@ -186,26 +215,102 @@ to spread-susceptible
   ask turtles with [color = pink] [
     let distance-to-source distance source-turtle
     if distance-to-source <= 5 [
-      let max-distance max [distance source-turtle] of turtles with [color = red]
-      if max-distance > 0 [
-        let normalized-distance distance-to-source / max-distance
-        ; Adjust the chance of spreading based on the number of turtles and the factor
-        let chance factor * normalized-distance
-        ifelse random-float 1 < chance [
-          set color orange + 1 ; Change color to orange plus 1
-        ] [
-          ; Do nothing or add any other actions for the "else" case
+      ; Check if there are turtles with color = red before calculating max-distance
+      let red-turtles turtles with [color = red]
+      if any? red-turtles [
+        let max-distance max [distance source-turtle] of red-turtles
+        if max-distance > 0 [
+          let normalized-distance distance-to-source / max-distance
+          let chance 0
+
+          ; Adjust the chance of spreading based on the number of turtles and the factor
+          if count turtles >= 0 and count turtles < 500 [
+            if routes >= 1 and routes <= 20 [
+              set chance 0.2
+            ]
+            if routes >= 21 and routes <= 40 [
+              set chance 0.3
+            ]
+            if routes >= 41 and routes <= 60 [
+              set chance 0.4
+            ]
+            if routes >= 61 and routes <= 80 [
+              set chance 0.4
+            ]
+            if routes >= 81 and routes <= 100 [
+              set chance 0.6
+            ]
+          ]
+
+          if count turtles >= 500 and count turtles < 1000 [
+            if routes >= 1 and routes <= 20 [
+              set chance 0.6
+            ]
+            if routes >= 21 and routes <= 40 [
+              set chance 0.7
+            ]
+            if routes >= 41 and routes <= 60 [
+              set chance 0.8
+            ]
+            if routes >= 61 and routes <= 80 [
+              set chance 0.9
+            ]
+            if routes >= 81 and routes <= 100 [
+              set chance 1
+            ]
+          ]
+
+          if count turtles >= 1000 and count turtles < 2000 [
+            if routes >= 1 and routes <= 20 [
+              set chance 1.2
+            ]
+            if routes >= 21 and routes <= 40 [
+              set chance 1.4
+            ]
+            if routes >= 41 and routes <= 60 [
+              set chance 1.6
+            ]
+            if routes >= 61 and routes <= 80 [
+              set chance 1.8
+            ]
+            if routes >= 81 and routes <= 100 [
+              set chance 2
+            ]
+          ]
+
+          if count turtles >= 2000 [
+            if routes >= 1 and routes <= 20 [
+              set chance 3
+            ]
+            if routes >= 21 and routes <= 40 [
+              set chance 3.5
+            ]
+            if routes >= 41 and routes <= 60 [
+              set chance 4
+            ]
+            if routes >= 61 and routes <= 80 [
+              set chance 4.5
+            ]
+            if routes >= 81 and routes <= 100 [
+              set chance 5
+            ]
+          ]
+
+          ifelse random-float 1 < (chance * random-chance) [
+            set color orange + 1 ; Change color to orange plus 1
+          ] [
+            ; Do nothing or add any other actions for the "else" case
+          ]
         ]
       ]
     ]
   ]
 end
 
-
 to spread-infectious
   ; Identify the infectious agents (orange + 1) and make them pink after a delay
   ask turtles with [color = orange + 1] [
-    let delay-time random 11 + 5 ; Random delay between 5 and 15 ticks
+    let delay-time random 5 + 5 ; Random delay between 5 and 15 ticks
     if ticks mod (delay-time + 1) = 0 [
       set color red ; Change color to red
     ]
@@ -215,18 +320,13 @@ end
 to spread-deceased
   ; Identify the deceased agents (red) and make them magenta-3 after a delay
   ask turtles with [color = red] [
-    let delay-time random 11 + 5 ; Random delay between 5 and 15 ticks
+    let delay-time random 3 + 3 ; Random delay between 3 and 5 ticks
     if ticks mod (delay-time + 1) = 0 [
       set color magenta - 3 ; Change color to magenta-3
     ]
   ]
+
 end
-
-
-
-
-
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 398
@@ -418,7 +518,7 @@ routes
 routes
 1
 100
-22.0
+100.0
 1
 1
 NIL
